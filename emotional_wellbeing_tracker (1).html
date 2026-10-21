@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Registro y monitoreo personal de episodios de desregulación emocional.">
+<title>Emotional Wellbeing Tracker</title>
+<style>
+:root{
+  --bg:#f7f5f9;--surface:#fff;--surface2:#f1edf5;--text:#282533;--muted:#716b7d;
+  --primary:#7866a9;--primary2:#9b8bc5;--lav:#e9e2f5;--blue:#dceaf4;--pink:#f4e1e8;
+  --coral:#e9a08f;--green:#8ab6a1;--border:#e4dfe9;--shadow:0 8px 28px rgba(52,43,69,.08);
+  --danger:#a95f68;--radius:18px;--font:16px;
+}
+[data-theme="dark"]{
+ --bg:#18171d;--surface:#242229;--surface2:#302d37;--text:#f3eff6;--muted:#b8b1bf;
+ --border:#403b48;--shadow:0 8px 28px rgba(0,0,0,.25);--lav:#3a3248;--blue:#2d3b45;--pink:#45333c;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:var(--font);line-height:1.5}
+button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(120,102,169,.3);outline-offset:2px}
+.app{display:flex;min-height:100vh}.sidebar{width:260px;background:var(--surface);border-right:1px solid var(--border);padding:24px 14px;position:fixed;inset:0 auto 0 0;z-index:30;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:12px;padding:4px 10px 25px}.brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--primary),var(--coral));color:white;display:grid;place-items:center;font-size:22px;box-shadow:var(--shadow)}.brand strong{font-size:16px}.brand small{color:var(--muted);display:block}
+.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:var(--muted);padding:12px 13px;border-radius:12px;text-align:left;display:flex;align-items:center;gap:12px;transition:.2s}.nav button:hover{background:var(--surface2);color:var(--text)}.nav button.active{background:var(--lav);color:var(--primary);font-weight:700}.nav-icon{width:22px;text-align:center}
+.side-note{margin-top:auto;background:var(--surface2);padding:13px;border-radius:14px;color:var(--muted);font-size:12px}.main{margin-left:260px;width:calc(100% - 260px);min-width:0}.topbar{height:70px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--surface) 92%,transparent);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:20;backdrop-filter:blur(10px)}.hamb{display:none;border:0;background:var(--surface2);border-radius:10px;padding:8px 12px}.content{padding:30px;max-width:1500px;margin:auto}.page{display:none;animation:fade .22s ease}.page.active{display:block}@keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}h1,h2,h3{margin:0 0 7px}h1{font-size:30px;letter-spacing:-.5px}h2{font-size:22px}h3{font-size:16px}.subtitle,.muted{color:var(--muted)}.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:24px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:10px 15px;border-radius:12px;font-weight:700;transition:.2s}.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.soft{background:var(--lav);color:var(--primary);border-color:transparent}.btn.danger{color:var(--danger)}.grid{display:grid;gap:16px}.kpis{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}.kpi{min-height:125px;position:relative;overflow:hidden}.kpi .label{color:var(--muted);font-size:13px;font-weight:700}.kpi .value{font-size:31px;font-weight:800;margin:7px 0 2px}.kpi .hint{font-size:12px;color:var(--muted)}.kpi .bubble{position:absolute;right:-15px;top:-18px;width:75px;height:75px;border-radius:50%;background:var(--lav);opacity:.8}
+.two{grid-template-columns:1.5fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.chart-card{min-height:300px}.chart-wrap{height:230px;margin-top:12px;position:relative}.chart-wrap canvas{width:100%;height:100%;display:block}.list{display:grid;gap:10px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}.row:last-child{border-bottom:0}.tag{display:inline-flex;align-items:center;background:var(--surface2);border:1px solid var(--border);padding:4px 8px;border-radius:999px;font-size:12px;margin:2px;color:var(--muted)}.tag.primary{background:var(--lav);color:var(--primary);border-color:transparent}.tag.coral{background:var(--pink);color:#9a5e65;border-color:transparent}
+.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.field{margin-bottom:17px}.field label{display:block;font-weight:700;font-size:13px;margin-bottom:7px}.field input,.field select,.field textarea{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:11px;padding:11px 12px}.field textarea{min-height:110px;resize:vertical}.full{grid-column:1/-1}.range-row{display:flex;align-items:center;gap:15px}.range-row input{flex:1;accent-color:var(--primary)}.intensity-value{width:62px;height:52px;border-radius:13px;background:var(--lav);color:var(--primary);display:grid;place-items:center;font-size:25px;font-weight:800}.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid var(--border);background:var(--surface);color:var(--muted);border-radius:999px;padding:8px 12px;transition:.15s}.chip:hover{border-color:var(--primary2)}.chip.selected{background:var(--lav);color:var(--primary);border-color:var(--primary2);font-weight:700}.required::after{content:" *";color:var(--danger)}
+.form-footer{display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);padding-top:18px;margin-top:8px}.section-title{margin:25px 0 13px;display:flex;justify-content:space-between;align-items:center}
+.filters{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:9px;margin-bottom:15px}.filters input,.filters select{width:100%;padding:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:10px}.episode{padding:0;overflow:hidden}.episode summary{list-style:none;padding:17px 19px;display:flex;align-items:center;gap:15px;cursor:pointer}.episode summary::-webkit-details-marker{display:none}.episode-main{flex:1;min-width:0}.episode-title{font-weight:800}.episode-meta{color:var(--muted);font-size:12px}.intensity-pill{min-width:44px;text-align:center;background:var(--lav);color:var(--primary);border-radius:10px;padding:6px;font-weight:800}.episode-body{padding:0 19px 18px;border-top:1px solid var(--border)}.episode-body .cols{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:15px}.empty{text-align:center;padding:45px 20px;color:var(--muted)}.empty-icon{font-size:38px;margin-bottom:8px}
+.stat-controls{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}.period{border:1px solid var(--border);background:var(--surface);color:var(--muted);padding:8px 13px;border-radius:10px}.period.active{background:var(--lav);color:var(--primary);font-weight:700}
+.pattern-card{display:flex;gap:14px;align-items:flex-start}.pattern-icon{width:42px;height:42px;border-radius:12px;background:var(--lav);display:grid;place-items:center;flex:none}
+.well-grid{grid-template-columns:repeat(3,1fr)}.tool-card{cursor:pointer;transition:.2s}.tool-card:hover{transform:translateY(-2px)}.tool-icon{font-size:27px;margin-bottom:10px}.tool-card p{color:var(--muted);font-size:13px}.breath{text-align:center}.breath-circle{width:130px;height:130px;border-radius:50%;background:var(--lav);margin:25px auto;display:grid;place-items:center;color:var(--primary);font-weight:800;transition:transform 4s ease-in-out}.breath-circle.expand{transform:scale(1.35)}.timer{font-size:34px;font-weight:800}.note-grid{grid-template-columns:repeat(3,1fr)}.note-card{position:relative}.note-card .delete-note{position:absolute;right:12px;top:12px;border:0;background:transparent;color:var(--muted)}.note-card p{white-space:pre-wrap}.setting-row{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:15px 0;border-bottom:1px solid var(--border)}.setting-row:last-child{border:0}.setting-row input,.setting-row select{max-width:270px;padding:9px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)}.privacy{background:var(--blue);border-radius:14px;padding:15px;font-size:13px;color:var(--text)}
+.toast{position:fixed;right:22px;bottom:22px;z-index:100;background:var(--text);color:var(--bg);padding:12px 16px;border-radius:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:none}.modal-backdrop{position:fixed;inset:0;background:rgba(20,17,26,.45);z-index:90;display:none;align-items:center;justify-content:center;padding:18px}.modal-backdrop.show{display:flex}.modal{width:min(680px,100%);max-height:90vh;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.2)}.modal-head{display:flex;justify-content:space-between;gap:15px}.close{border:0;background:var(--surface2);border-radius:9px;width:34px;height:34px}.drawer-overlay{display:none}
+.progress{height:6px;background:var(--surface2);border-radius:999px;overflow:hidden;margin:12px 0}.progress span{display:block;height:100%;background:var(--primary);border-radius:999px}.mini-bar{height:8px;background:var(--surface2);border-radius:999px;overflow:hidden;min-width:90px}.mini-bar span{display:block;height:100%;background:var(--primary2);border-radius:999px}
+.tooltip{position:relative}.tooltip:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:5px 8px;border-radius:7px;font-size:11px;white-space:nowrap;z-index:50}
+@media(max-width:1050px){.kpis{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr 1fr}.well-grid,.note-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:780px){.sidebar{transform:translateX(-100%);transition:.25s;width:275px}.sidebar.open{transform:none}.main{margin-left:0;width:100%}.hamb{display:block}.drawer-overlay.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:25}.topbar{padding:0 16px}.content{padding:20px 14px}.page-head{flex-direction:column}.two,.three,.form-grid,.episode-body .cols,.well-grid,.note-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.kpis{grid-template-columns:1fr 1fr}.setting-row{align-items:flex-start;flex-direction:column}.setting-row input,.setting-row select{max-width:none;width:100%}}
+@media(max-width:470px){h1{font-size:25px}.kpis{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.filters input{grid-column:auto}.card{padding:16px}.actions .btn{flex:1}.episode summary{align-items:flex-start}.episode summary .actions{margin-left:auto}.episode summary .actions .btn{padding:7px}.chart-wrap{height:200px}}
+.no-anim *,.no-anim *::before,.no-anim *::after{transition:none!important;animation:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-mark">♡</div><div><strong>Emotional Wellbeing</strong><small>Tu espacio personal</small></div></div>
+  <nav class="nav" aria-label="Navegación principal">
+    <button data-page="dashboard" class="active"><span class="nav-icon">🏠</span>Dashboard</button>
+    <button data-page="record"><span class="nav-icon">➕</span>Registrar episodio</button>
+    <button data-page="history"><span class="nav-icon">📋</span>Historial</button>
+    <button data-page="stats"><span class="nav-icon">📊</span>Estadísticas</button>
+    <button data-page="patterns"><span class="nav-icon">🧩</span>Patrones y detonantes</button>
+    <button data-page="wellbeing"><span class="nav-icon">❤️</span>Bienestar</button>
+    <button data-page="notes"><span class="nav-icon">📝</span>Notas personales</button>
+    <button data-page="settings"><span class="nav-icon">⚙️</span>Configuración</button>
+  </nav>
+  <div class="side-note">🔒 <strong>Privado por diseño</strong><br>Los datos se guardan únicamente en este navegador.</div>
+</aside>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<main class="main">
+<header class="topbar"><button class="hamb" id="hamb" aria-label="Abrir menú">☰</button><div class="muted" id="greeting">Tu bienestar, un día a la vez.</div><div id="headerAlias"></div></header>
+<div class="content">
+
+<section id="dashboard" class="page active">
+  <div class="page-head"><div><h1>Hola, <span id="dashAlias">tú</span> 🌿</h1><p class="subtitle">Un resumen amable de tus registros recientes.</p></div><div class="actions"><button class="btn soft" id="demoBtn">✨ Cargar datos de ejemplo</button><button class="btn primary" data-go="record">＋ Registrar episodio</button></div></div>
+  <div class="grid kpis">
+    <div class="card kpi"><div class="bubble"></div><span class="label">Últimos 7 días</span><div class="value" id="kpi7">0</div><span class="hint">episodios registrados</span></div>
+    <div class="card kpi"><div class="bubble"></div><span class="label">Últimos 30 días</span><div class="value" id="kpi30">0</div><span class="hint">episodios registrados</span></div>
+    <div class="card kpi"><div class="bubble"></div><span class="label">Intensidad promedio</span><div class="value" id="kpiIntensity">—</div><span class="hint">escala de 1 a 10</span></div>
+    <div class="card kpi"><div class="bubble"></div><span class="label">Duración promedio</span><div class="value" id="kpiDuration">—</div><span class="hint">minutos</span></div>
+  </div>
+  <div class="grid two">
+    <div class="card chart-card"><h2>Tendencia reciente</h2><p class="muted">Intensidad de los episodios registrados</p><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
+    <div class="card"><h2>Último episodio</h2><div id="lastEpisode" class="empty"><div class="empty-icon">🌱</div>Aún no hay registros.</div></div>
+  </div>
+  <div class="grid three" style="margin-top:16px">
+    <div class="card"><h3>Emociones predominantes</h3><div id="dashEmotions" class="list"></div></div>
+    <div class="card"><h3>Detonantes frecuentes</h3><div id="dashTriggers" class="list"></div></div>
+    <div class="card"><h3>Cuándo ocurre más</h3><div id="dashTiming" class="list"></div></div>
+  </div>
+</section>
+
+<section id="record" class="page">
+  <div class="page-head"><div><h1 id="recordTitle">Registrar episodio</h1><p class="subtitle">Completa solo lo que te resulte cómodo. No necesitas explicar todo.</p></div></div>
+  <form id="episodeForm" class="card">
+    <input type="hidden" id="editId">
+    <div class="section-title"><h2>1. Información básica</h2><span class="muted">Paso 1 de 4</span></div>
+    <div class="grid form-grid">
+      <div class="field"><label class="required">Fecha</label><input type="date" id="date" required></div>
+      <div class="field"><label class="required">Hora de inicio</label><input type="time" id="start" required></div>
+      <div class="field"><label>Hora de finalización</label><input type="time" id="end"><small class="muted">La duración se calcula automáticamente.</small></div>
+      <div class="field"><label>Duración</label><input id="duration" readonly placeholder="Se calculará aquí"></div>
+    </div>
+    <div class="section-title"><h2>2. Intensidad</h2><span class="muted">Paso 2 de 4</span></div>
+    <div class="field"><label>¿Qué tan intensa fue la experiencia?</label><div class="range-row"><input type="range" id="intensity" min="1" max="10" value="5"><div class="intensity-value" id="intensityValue">5</div></div></div>
+    <div class="section-title"><h2>3. Emociones y contexto</h2><span class="muted">Paso 3 de 4</span></div>
+    <div class="field"><label>Emociones <span class="muted">(puedes elegir varias)</span></label><div class="chips" id="emotionChips"></div></div>
+    <div class="field"><label>Detonantes</label><div class="chips" id="triggerChips"></div></div>
+    <div class="field"><label>Señales o síntomas observados</label><div class="chips" id="symptomChips"></div></div>
+    <div class="grid form-grid">
+      <div class="field"><label>¿Dónde ocurrió?</label><input id="location" placeholder="Ej. casa, trabajo, transporte..."></div>
+      <div class="field"><label>¿Con quién estaba?</label><input id="withWho" placeholder="Ej. sola, pareja, compañera..."></div>
+      <div class="field full"><label>¿Qué estaba haciendo?</label><input id="activity"></div>
+      <div class="field full"><label>¿Qué ocurrió justo antes?</label><textarea id="before" placeholder="Describe brevemente lo que recuerdes."></textarea></div>
+    </div>
+    <div class="section-title"><h2>4. Qué ayudó y notas</h2><span class="muted">Paso 4 de 4</span></div>
+    <div class="field"><label>Estrategias que ayudaron</label><div class="chips" id="helpChips"></div></div>
+    <div class="field"><label>Notas personales</label><textarea id="notes" placeholder="Puedes escribir libremente, sin juzgarte."></textarea></div>
+    <div class="form-footer"><button type="button" class="btn" id="cancelEdit">Limpiar</button><button type="submit" class="btn primary">Guardar episodio</button></div>
+  </form>
+</section>
+
+<section id="history" class="page">
+  <div class="page-head"><div><h1>Historial</h1><p class="subtitle">Revisa tus registros a tu propio ritmo.</p></div></div>
+  <div class="card">
+    <div class="filters">
+      <input id="searchHistory" placeholder="🔎 Buscar en notas, contexto...">
+      <select id="filterIntensity"><option value="">Cualquier intensidad</option><option value="1-3">1–3 suave</option><option value="4-6">4–6 media</option><option value="7-10">7–10 alta</option></select>
+      <select id="filterEmotion"><option value="">Cualquier emoción</option></select>
+      <select id="filterTrigger"><option value="">Cualquier detonante</option></select>
+      <select id="sortHistory"><option value="new">Más recientes</option><option value="old">Más antiguos</option><option value="high">Mayor intensidad</option><option value="low">Menor intensidad</option></select>
+    </div>
+    <div id="historyList" class="list"></div>
+  </div>
+</section>
+
+<section id="stats" class="page">
+  <div class="page-head"><div><h1>Estadísticas</h1><p class="subtitle">Observa tendencias descriptivas de tus propios registros.</p></div></div>
+  <div class="stat-controls"><button class="period active" data-period="7">7 días</button><button class="period" data-period="30">30 días</button><button class="period" data-period="90">90 días</button><button class="period" data-period="all">Todo</button></div>
+  <div class="grid kpis">
+    <div class="card kpi"><span class="label">Total</span><div class="value" id="statTotal">0</div></div>
+    <div class="card kpi"><span class="label">Promedio de intensidad</span><div class="value" id="statAvg">—</div></div>
+    <div class="card kpi"><span class="label">Intensidad máxima</span><div class="value" id="statMax">—</div></div>
+    <div class="card kpi"><span class="label">Duración promedio</span><div class="value" id="statDur">—</div></div>
+  </div>
+  <div class="grid two"><div class="card chart-card"><h2>Evolución</h2><div class="chart-wrap"><canvas id="statsTrend"></canvas></div></div><div class="card chart-card"><h2>Emociones</h2><div class="chart-wrap"><canvas id="emotionChart"></canvas></div></div></div>
+  <div class="grid two" style="margin-top:16px"><div class="card chart-card"><h2>Detonantes</h2><div class="chart-wrap"><canvas id="triggerChart"></canvas></div></div><div class="card chart-card"><h2>Por día de la semana</h2><div class="chart-wrap"><canvas id="weekdayChart"></canvas></div></div></div>
+  <div class="card chart-card" style="margin-top:16px"><h2>Por rango horario</h2><div class="chart-wrap"><canvas id="hourChart"></canvas></div></div>
+</section>
+
+<section id="patterns" class="page">
+  <div class="page-head"><div><h1>Patrones y detonantes</h1><p class="subtitle">Observaciones descriptivas basadas exclusivamente en tus registros.</p></div></div>
+  <div id="patternsList" class="grid two"></div>
+  <div class="card" style="margin-top:16px"><h2>Resumen de frecuencia</h2><div id="patternBars" class="list"></div></div>
+</section>
+
+<section id="wellbeing" class="page">
+  <div class="page-head"><div><h1>Bienestar</h1><p class="subtitle">Pequeñas herramientas para acompañarte en el momento.</p></div></div>
+  <div class="grid well-grid">
+    <div class="card tool-card" data-tool="breath"><div class="tool-icon">🌬️</div><h3>Respiración guiada</h3><p>Un ciclo sencillo para hacer una pausa y acompañar tu respiración.</p></div>
+    <div class="card tool-card" data-tool="ground"><div class="tool-icon">🌿</div><h3>Grounding 5–4–3–2–1</h3><p>Orientación sensorial hacia lo que está presente a tu alrededor.</p></div>
+    <div class="card tool-card" data-tool="pause"><div class="tool-icon">⏳</div><h3>Pausa de 60 segundos</h3><p>Un minuto sin exigencias para bajar el ritmo y observar.</p></div>
+    <div class="card tool-card" data-tool="journal"><div class="tool-icon">📝</div><h3>Diario emocional</h3><p>Escribe lo que sientes y, si quieres, guárdalo en tus notas.</p></div>
+    <div class="card tool-card" data-tool="people"><div class="tool-icon">🤍</div><h3>Personas de confianza</h3><p>Registra contactos o personas a quienes te gustaría acudir.</p></div>
+    <div class="card tool-card" data-tool="activities"><div class="tool-icon">☁️</div><h3>Actividades que ayudan</h3><p>Una lista personal de cosas que suelen acompañarte.</p></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h2>Cuidados sencillos</h2><div class="grid three"><div class="pattern-card"><div class="pattern-icon">💧</div><div><h3>Hidratación</h3><p class="muted">Haz una pausa para beber agua si te resulta posible.</p></div></div><div class="pattern-card"><div class="pattern-icon">🌙</div><div><h3>Descanso</h3><p class="muted">Considera darte permiso para descansar y reducir exigencias.</p></div></div><div class="pattern-card"><div class="pattern-icon">🫶</div><div><h3>Apoyo</h3><p class="muted">Si lo necesitas, considera contactar a alguien de confianza.</p></div></div></div></div>
+</section>
+
+<section id="notes" class="page">
+  <div class="page-head"><div><h1>Notas personales</h1><p class="subtitle">Un pequeño diario privado guardado en este navegador.</p></div><button class="btn primary" id="newNote">＋ Nueva nota</button></div>
+  <div class="card" style="margin-bottom:15px"><input id="noteSearch" placeholder="🔎 Buscar notas..." style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)"></div>
+  <div id="notesList" class="grid note-grid"></div>
+</section>
+
+<section id="settings" class="page">
+  <div class="page-head"><div><h1>Configuración</h1><p class="subtitle">Personaliza la experiencia y administra tus datos.</p></div></div>
+  <div class="card">
+    <div class="setting-row"><div><strong>Nombre o alias</strong><div class="muted">Se mostrará solo dentro de esta aplicación.</div></div><input id="aliasSetting" placeholder="Tu alias"></div>
+    <div class="setting-row"><div><strong>Tema</strong><div class="muted">Claro u oscuro.</div></div><select id="themeSetting"><option value="light">Claro</option><option value="dark">Oscuro</option></select></div>
+    <div class="setting-row"><div><strong>Tamaño de fuente</strong></div><select id="fontSetting"><option value="15px">Pequeño</option><option value="16px">Normal</option><option value="18px">Grande</option><option value="20px">Muy grande</option></select></div>
+    <div class="setting-row"><div><strong>Animaciones</strong><div class="muted">Transiciones y microinteracciones.</div></div><input type="checkbox" id="motionSetting" checked></div>
+  </div>
+  <div class="card" style="margin-top:16px"><h2>Datos</h2><p class="muted">Puedes llevarte una copia de tus registros o restaurarla en otro navegador.</p><div class="actions"><button class="btn" id="exportJson">⬇ Exportar JSON</button><button class="btn" id="exportCsv">⬇ Exportar CSV</button><label class="btn" style="display:inline-flex;align-items:center;gap:5px">⬆ Importar JSON<input id="importFile" type="file" accept=".json,application/json" hidden></label><button class="btn soft" id="demoSettings">✨ Cargar datos de ejemplo</button><button class="btn danger" id="clearAll">Borrar todos los datos</button></div></div>
+  <div class="card" style="margin-top:16px"><h2>Privacidad y uso responsable</h2><div class="privacy">🔒 <strong>Almacenamiento local:</strong> los registros de esta aplicación se guardan mediante <code>localStorage</code> en este navegador y no se envían automáticamente a un servidor. La aplicación no es una herramienta de diagnóstico médico y los patrones son únicamente descriptivos. Si una persona está en peligro inmediato, piensa en hacerse daño o no puede mantenerse segura, busca ayuda profesional o servicios de emergencia de tu localidad.</div></div>
+</section>
+
+</div></main></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
+
+<script>
+"use strict";
+
+/* =========================
+   Emotional Wellbeing Tracker
+   Todo el estado se conserva localmente.
+   ========================= */
+
+const STORE = "ewt_v1";
+const EMOTIONS = ["Tristeza","Ansiedad","Enojo","Frustración","Miedo","Soledad","Culpa","Vergüenza","Agobio","Irritabilidad","Vacío","Otra"];
+const TRIGGERS = ["Trabajo / estudios","Relaciones","Familia","Conflicto","Presión social","Problemas económicos","Falta de sueño","Cansancio","Cambios hormonales","Redes sociales","Sobrecarga de responsabilidades","Evento inesperado","Otro"];
+const SYMPTOMS = ["Llanto","Pensamientos acelerados","Dificultad para concentrarse","Irritabilidad","Sensación de estar sobrepasada","Aislamiento","Dificultad para dormir","Síntomas físicos","Otro"];
+const HELP = ["Hablar con alguien","Estar sola","Respiración","Caminar","Dormir","Escuchar música","Escribir","Comer / beber agua","Alejarme de la situación","Otra estrategia"];
+const state = {
+  episodes: [], notes: [], settings: {alias:"",theme:"light",font:"16px",motion:true}, period:"7"
+};
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
+function load(){
+  try{
+    const x=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(x){ state.episodes=Array.isArray(x.episodes)?x.episodes:[]; state.notes=Array.isArray(x.notes)?x.notes:[]; state.settings={...state.settings,...(x.settings||{})}; }
+  }catch(e){ console.warn("No se pudo leer localStorage",e); }
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function fmtDate(d){return new Intl.DateTimeFormat("es-MX",{dateStyle:"medium"}).format(new Date(d+"T12:00:00"));}
+function fmtDateTime(e){return `${fmtDate(e.date)} · ${e.start||"sin hora"}`;}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2600);}
+function modal(title,body,buttons=""){
+  $("#modal").innerHTML=`<div class="modal-head"><div><h2>${title}</h2></div><button class="close" data-close>×</button></div><div style="margin-top:15px">${body}</div>${buttons?`<div class="form-footer">${buttons}</div>`:""}`;
+  $("#modalBackdrop").classList.add("show");
+}
+function closeModal(){$("#modalBackdrop").classList.remove("show");}
+function isoToday(){return new Date().toISOString().slice(0,10);}
+function dateDaysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().slice(0,10);}
+function durationBetween(a,b){
+  if(!a||!b)return "";
+  const [ah,am]=a.split(":").map(Number),[bh,bm]=b.split(":").map(Number);
+  let mins=bh*60+bm-(ah*60+am);if(mins<0)mins+=1440;
+  return mins;
+}
+function periodEpisodes(period=state.period){
+  if(period==="all")return [...state.episodes];
+  const n=Number(period), cutoff=dateDaysAgo(n-1);
+  return state.episodes.filter(e=>e.date>=cutoff&&e.date<=isoToday());
+}
+function counts(arr,key){
+  const m={};arr.forEach(e=>(e[key]||[]).forEach(v=>m[v]=(m[v]||0)+1));return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+}
+function avg(a){return a.length?a.reduce((s,x)=>s+x,0)/a.length:0;}
+function timeBucket(t){
+  if(!t)return "Sin hora";
+  const h=Number(t.split(":")[0]);
+  if(h<6)return "Madrugada";if(h<12)return "Mañana";if(h<18)return "Tarde";return "Noche";
+}
+function topLabel(arr, fallback="Sin datos"){return arr.length?arr[0][0]:fallback;}
+
+/* Navigation */
+function go(page){
+  $$(".page").forEach(p=>p.classList.toggle("active",p.id===page));
+  $$(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  $("#sidebar").classList.remove("open");$("#drawerOverlay").classList.remove("show");
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(page==="dashboard")renderDashboard();
+  if(page==="history")renderHistory();
+  if(page==="stats")renderStats();
+  if(page==="patterns")renderPatterns();
+  if(page==="notes")renderNotes();
+}
+$$(".nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+$$("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+$("#hamb").addEventListener("click",()=>{$("#sidebar").classList.add("open");$("#drawerOverlay").classList.add("show")});
+$("#drawerOverlay").addEventListener("click",()=>{$("#sidebar").classList.remove("open");$("#drawerOverlay").classList.remove("show")});
+$("#modalBackdrop").addEventListener("click",e=>{if(e.target.id==="modalBackdrop")closeModal()});
+
+/* Chips */
+function renderChips(id,items,selected=[]){
+  $("#"+id).innerHTML=items.map(x=>`<button type="button" class="chip ${selected.includes(x)?"selected":""}" data-chip="${esc(x)}">${esc(x)}</button>`).join("");
+  $("#"+id).querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>b.classList.toggle("selected")));
+}
+renderChips("emotionChips",EMOTIONS);renderChips("triggerChips",TRIGGERS);renderChips("symptomChips",SYMPTOMS);renderChips("helpChips",HELP);
+function selected(id){return $$("#"+id+" .chip.selected").map(x=>x.dataset.chip);}
+
+/* Episode form */
+$("#date").value=isoToday();
+$("#intensity").addEventListener("input",e=>$("#intensityValue").textContent=e.target.value);
+["start","end"].forEach(id=>$("#"+id).addEventListener("input",()=>{
+  const d=durationBetween($("#start").value,$("#end").value);
+  $("#duration").value=d!==""?`${d} min`:"";
+}));
+function resetForm(){
+  $("#episodeForm").reset();$("#editId").value="";$("#date").value=isoToday();$("#intensity").value=5;$("#intensityValue").textContent="5";$("#duration").value="";
+  ["emotionChips","triggerChips","symptomChips","helpChips"].forEach(id=>$("#"+id).querySelectorAll(".selected").forEach(x=>x.classList.remove("selected")));
+  $("#recordTitle").textContent="Registrar episodio";
+}
+$("#cancelEdit").addEventListener("click",resetForm);
+$("#episodeForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const item={
+    id:$("#editId").value||uid(),date:$("#date").value,start:$("#start").value,end:$("#end").value,
+    duration:durationBetween($("#start").value,$("#end").value),intensity:Number($("#intensity").value),
+    emotions:selected("emotionChips"),triggers:selected("triggerChips"),symptoms:selected("symptomChips"),
+    location:$("#location").value.trim(),withWho:$("#withWho").value.trim(),activity:$("#activity").value.trim(),
+    before:$("#before").value.trim(),help:selected("helpChips"),notes:$("#notes").value.trim(),updatedAt:new Date().toISOString()
+  };
+  if(!item.date||!item.start){toast("Completa la fecha y la hora de inicio.");return;}
+  const idx=state.episodes.findIndex(x=>x.id===item.id);
+  if(idx>=0)state.episodes[idx]=item;else state.episodes.push(item);
+  state.episodes.sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start));
+  save();resetForm();toast(idx>=0?"Episodio actualizado":"Episodio guardado");go("dashboard");
+});
+function editEpisode(id){
+  const e=state.episodes.find(x=>x.id===id);if(!e)return;
+  $("#editId").value=e.id;$("#date").value=e.date;$("#start").value=e.start||"";$("#end").value=e.end||"";
+  $("#intensity").value=e.intensity||5;$("#intensityValue").textContent=e.intensity||5;
+  $("#duration").value=e.duration?`${e.duration} min`:"";$("#location").value=e.location||"";$("#withWho").value=e.withWho||"";
+  $("#activity").value=e.activity||"";$("#before").value=e.before||"";$("#notes").value=e.notes||"";
+  renderChips("emotionChips",EMOTIONS,e.emotions||[]);renderChips("triggerChips",TRIGGERS,e.triggers||[]);renderChips("symptomChips",SYMPTOMS,e.symptoms||[]);renderChips("helpChips",HELP,e.help||[]);
+  $("#recordTitle").textContent="Editar episodio";go("record");
+}
+function deleteEpisode(id){
+  modal("Eliminar episodio","Esta acción eliminará este registro del almacenamiento local.","<button class='btn' data-close>Cancelar</button><button class='btn danger' id='confirmDelete'>Eliminar</button>");
+  $("#confirmDelete").onclick=()=>{state.episodes=state.episodes.filter(e=>e.id!==id);save();closeModal();toast("Episodio eliminado");renderHistory();renderDashboard();renderStats();renderPatterns();};
+}
+
+/* Dashboard */
+function renderDashboard(){
+  const e7=periodPeriod(7),e30=periodPeriod(30);
+  $("#kpi7").textContent=e7.length;$("#kpi30").textContent=e30.length;
+  $("#kpiIntensity").textContent=e30.length?avg(e30.map(e=>e.intensity)).toFixed(1):"—";
+  const ds=e30.filter(e=>e.duration>0).map(e=>e.duration);$("#kpiDuration").textContent=ds.length?Math.round(avg(ds))+"m":"—";
+  const last=state.episodes.slice().sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start))[0];
+  $("#lastEpisode").innerHTML=last?`<div style="padding-top:12px"><strong>${fmtDateTime(last)}</strong><div style="margin:12px 0"><span class="intensity-pill"> ${last.intensity}/10</span></div>${(last.emotions||[]).slice(0,4).map(x=>`<span class="tag primary">${esc(x)}</span>`).join("")}<p class="muted">${esc((last.notes||last.before||"Sin notas").slice(0,180))}</p><button class="btn soft" data-edit-last>Ver / editar</button></div>`:`<div class="empty"><div class="empty-icon">🌱</div>Aún no hay registros.<br><button class="btn soft" data-go="record" style="margin-top:10px">Registrar el primero</button></div>`;
+  const le=$("#lastEpisode [data-edit-last]");if(le)le.onclick=()=>editEpisode(last.id);
+  const ce=counts(e30,"emotions"),ct=counts(e30,"triggers");
+  $("#dashEmotions").innerHTML=barList(ce.slice(0,4));$("#dashTriggers").innerHTML=barList(ct.slice(0,4));
+  const buckets=counts(e30.map(e=>({...e,emotions:[timeBucket(e.start)]})),"emotions");
+  const weekdays={};e30.forEach(e=>{const d=new Date(e.date+"T12:00:00");const k=new Intl.DateTimeFormat("es-MX",{weekday:"long"}).format(d);weekdays[k]=(weekdays[k]||0)+1});
+  const wd=Object.entries(weekdays).sort((a,b)=>b[1]-a[1]);
+  $("#dashTiming").innerHTML=(buckets.length?`<div class="row"><span>Rango más frecuente</span><strong>${esc(buckets[0][0])}</strong></div>`:"<div class='muted'>Sin datos de horario.</div>")+(wd.length?`<div class="row"><span>Día más frecuente</span><strong>${esc(wd[0][0])}</strong></div>`:"");
+  drawLine("trendChart",e30.slice().sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start)).map(e=>({label:e.date.slice(5),value:e.intensity})), "Intensidad");
+}
+function periodPeriod(n){const cutoff=dateDaysAgo(n-1);return state.episodes.filter(e=>e.date>=cutoff&&e.date<=isoToday());}
+function barList(items){
+  if(!items.length)return "<div class='muted'>Aún no hay datos.</div>";
+  const max=items[0][1];return items.map(([k,v])=>`<div class="row"><span>${esc(k)}</span><div style="display:flex;align-items:center;gap:8px"><div class="mini-bar"><span style="width:${v/max*100}%"></span></div><strong>${v}</strong></div></div>`).join("");
+}
+
+/* History */
+function populateFilters(){
+  $("#filterEmotion").innerHTML='<option value="">Cualquier emoción</option>'+EMOTIONS.map(x=>`<option>${esc(x)}</option>`).join("");
+  $("#filterTrigger").innerHTML='<option value="">Cualquier detonante</option>'+TRIGGERS.map(x=>`<option>${esc(x)}</option>`).join("");
+}
+function renderHistory(){
+  const q=$("#searchHistory").value.toLowerCase(),fi=$("#filterIntensity").value,fe=$("#filterEmotion").value,ft=$("#filterTrigger").value,sort=$("#sortHistory").value;
+  let arr=state.episodes.filter(e=>{
+    const hay=[e.notes,e.before,e.location,e.withWho,e.activity,...(e.emotions||[]),...(e.triggers||[])].join(" ").toLowerCase();
+    const intensity=!fi||(fi==="1-3"?e.intensity<=3:fi==="4-6"?e.intensity>=4&&e.intensity<=6:e.intensity>=7);
+    return (!q||hay.includes(q))&&intensity&&(!fe||(e.emotions||[]).includes(fe))&&(!ft||(e.triggers||[]).includes(ft));
+  });
+  arr.sort((a,b)=>{if(sort==="high")return b.intensity-a.intensity;if(sort==="low")return a.intensity-b.intensity;const x=(b.date+b.start).localeCompare(a.date+a.start);return sort==="old"?-x:x;});
+  $("#historyList").innerHTML=arr.length?arr.map(e=>episodeHTML(e)).join(""):`<div class="empty"><div class="empty-icon">📋</div><strong>${state.episodes.length?"No hay coincidencias":"Todavía no hay episodios"}</strong><p>${state.episodes.length?"Prueba otros filtros.":"Registra un episodio o carga datos de ejemplo para comenzar."}</p></div>`;
+  $$("#historyList [data-edit]").forEach(b=>b.onclick=()=>editEpisode(b.dataset.edit));
+  $$("#historyList [data-delete]").forEach(b=>b.onclick=()=>deleteEpisode(b.dataset.delete));
+}
+function episodeHTML(e){
+ return `<details class="card episode"><summary><span class="intensity-pill">${e.intensity}/10</span><div class="episode-main"><div class="episode-title">${fmtDateTime(e)}</div><div class="episode-meta">${e.duration?e.duration+" min · ":""}${esc((e.emotions||[]).slice(0,3).join(" · "))}</div></div><span>⌄</span></summary><div class="episode-body"><div class="cols"><div><strong>Emociones</strong><div>${tags(e.emotions,"primary")}</div><strong>Detonantes</strong><div>${tags(e.triggers)}</div><strong>Señales</strong><div>${tags(e.symptoms,"coral")}</div></div><div><strong>Qué ayudó</strong><div>${tags(e.help)}</div><p><strong>Contexto:</strong><br>${esc(e.location||"")} ${esc(e.withWho?" · "+e.withWho:"")} ${esc(e.activity?" · "+e.activity:"")}</p><p><strong>Antes:</strong><br>${esc(e.before||"—")}</p><p><strong>Notas:</strong><br>${esc(e.notes||"—")}</p></div></div><div class="actions"><button class="btn soft" data-edit="${e.id}">Editar</button><button class="btn danger" data-delete="${e.id}">Eliminar</button></div></div></details>`;
+}
+function tags(a=[],cls=""){return a.length?a.map(x=>`<span class="tag ${cls}">${esc(x)}</span>`).join(""):"<span class='muted'>—</span>";}
+["searchHistory","filterIntensity","filterEmotion","filterTrigger","sortHistory"].forEach(id=>$( "#"+id).addEventListener("input",renderHistory));
+
+/* Lightweight canvas charts, no external libraries */
+function setupCanvas(canvas){const r=canvas.getBoundingClientRect(),d=window.devicePixelRatio||1;canvas.width=Math.max(300,r.width*d);canvas.height=Math.max(160,r.height*d);const c=canvas.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c,w:r.width,h:r.height};}
+function drawLine(id,data){
+ const cv=$("#"+id);if(!cv)return;const {c,w,h}=setupCanvas(cv);c.clearRect(0,0,w,h);
+ c.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--border");c.lineWidth=1;
+ for(let i=0;i<5;i++){const y=15+i*(h-35)/4;c.beginPath();c.moveTo(35,y);c.lineTo(w-8,y);c.stroke();}
+ if(!data.length){c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--muted");c.fillText("Sin datos para mostrar",45,h/2);return}
+ const max=10,min=1,step=(w-55)/Math.max(1,data.length-1);c.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--primary");c.lineWidth=3;c.beginPath();
+ data.forEach((p,i)=>{const x=35+i*step,y=15+(max-p.value)/(max-min)*(h-40);i?c.lineTo(x,y):c.moveTo(x,y)});c.stroke();
+ c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--primary");data.forEach((p,i)=>{const x=35+i*step,y=15+(max-p.value)/(max-min)*(h-40);c.beginPath();c.arc(x,y,4,0,Math.PI*2);c.fill();});
+ c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--muted");c.font="11px system-ui";data.filter((_,i)=>i===0||i===data.length-1||data.length<8).forEach(p=>{const i=data.indexOf(p);c.fillText(p.label,35+i*step,h-8)});
+}
+function drawBars(id,items,horizontal=false){
+ const cv=$("#"+id);if(!cv)return;const {c,w,h}=setupCanvas(cv);c.clearRect(0,0,w,h);
+ if(!items.length){c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--muted");c.fillText("Sin datos para mostrar",35,h/2);return}
+ const max=Math.max(...items.map(x=>x[1]),1),base=h-28;
+ if(horizontal){
+  const bh=Math.min(28,(h-40)/items.length-7);items.forEach((x,i)=>{const y=18+i*(bh+7),len=(w-145)*x[1]/max;c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--primary2");c.fillRect(125,y,len,bh);c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--text");c.font="11px system-ui";c.fillText(x[0].slice(0,19),5,y+bh-8);c.fillText(x[1],130+len,y+bh-8)});
+ }else{
+  const bw=Math.max(10,(w-35)/items.length-8);items.forEach((x,i)=>{const bh=(base-10)*x[1]/max,xx=25+i*(bw+8);c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--primary2");c.fillRect(xx,base-bh,bw,bh);c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--muted");c.font="10px system-ui";c.fillText(x[0].slice(0,9),xx,base+14);c.fillText(x[1],xx,base-bh-5)});
+ }
+}
+function drawDonut(id,items){
+ const cv=$("#"+id);if(!cv)return;const {c,w,h}=setupCanvas(cv);c.clearRect(0,0,w,h);
+ if(!items.length){c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--muted");c.fillText("Sin datos para mostrar",35,h/2);return}
+ const total=items.reduce((s,x)=>s+x[1],0),cx=w*.33,cy=h/2,r=Math.min(75,h/2-10);let a=-Math.PI/2;
+ const colors=["#7866a9","#9b8bc5","#e9a08f","#8ab6a1","#6f9bb2","#c69aa7","#b9a56e","#8e819b"];
+ items.slice(0,8).forEach((x,i)=>{const da=x[1]/total*Math.PI*2;c.beginPath();c.moveTo(cx,cy);c.arc(cx,cy,r,a,a+da);c.closePath();c.fillStyle=colors[i%colors.length];c.fill();a+=da});
+ c.globalCompositeOperation="destination-out";c.beginPath();c.arc(cx,cy,r*.55,0,Math.PI*2);c.fill();c.globalCompositeOperation="source-over";
+ items.slice(0,8).forEach((x,i)=>{const y=20+i*23;c.fillStyle=colors[i%colors.length];c.fillRect(w*.58,y,10,10);c.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--text");c.font="11px system-ui";c.fillText(`${x[0].slice(0,17)} (${x[1]})`,w*.58+16,y+10)});
+}
+function renderStats(){
+ const arr=periodEpisodes();$("#statTotal").textContent=arr.length;$("#statAvg").textContent=arr.length?avg(arr.map(e=>e.intensity)).toFixed(1):"—";$("#statMax").textContent=arr.length?Math.max(...arr.map(e=>e.intensity)):"—";const ds=arr.filter(e=>e.duration>0).map(e=>e.duration);$("#statDur").textContent=ds.length?Math.round(avg(ds))+"m":"—";
+ const sorted=arr.slice().sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));drawLine("statsTrend",sorted.map(e=>({label:e.date.slice(5),value:e.intensity})));
+ drawDonut("emotionChart",counts(arr,"emotions").slice(0,8));drawBars("triggerChart",counts(arr,"triggers").slice(0,8),true);
+ const days=["lunes","martes","miércoles","jueves","viernes","sábado","domingo"],wm=Object.fromEntries(days.map(d=>[d,0]));arr.forEach(e=>{let d=new Date(e.date+"T12:00:00").getDay();d=(d+6)%7;wm[days[d]]++});drawBars("weekdayChart",days.map(d=>[d,wm[d]]));
+ const hm={"Madrugada":0,"Mañana":0,"Tarde":0,"Noche":0};arr.forEach(e=>hm[timeBucket(e.start)]++);drawBars("hourChart",Object.entries(hm));
+}
+$$(".period").forEach(b=>b.addEventListener("click",()=>{$$(".period").forEach(x=>x.classList.remove("active"));b.classList.add("active");state.period=b.dataset.period;renderStats()}));
+
+/* Patterns */
+function renderPatterns(){
+ const arr=state.episodes,em=counts(arr,"emotions"),tr=counts(arr,"triggers"),tb=counts(arr.map(e=>({...e,emotions:[timeBucket(e.start)]})),"emotions");
+ const days=["lunes","martes","miércoles","jueves","viernes","sábado","domingo"],wm=Object.fromEntries(days.map(d=>[d,0]));arr.forEach(e=>{let d=(new Date(e.date+"T12:00:00").getDay()+6)%7;wm[days[d]]++});const wd=Object.entries(wm).sort((a,b)=>b[1]-a[1]);
+ let patterns=[];
+ if(em.length)patterns.push(["💭","Emoción más frecuente",`En tus registros, la emoción seleccionada con mayor frecuencia es <strong>${esc(em[0][0])}</strong> (${em[0][1]} registros).`]);
+ if(tr.length)patterns.push(["🧩","Detonante más frecuente",`El detonante registrado con mayor frecuencia es <strong>${esc(tr[0][0])}</strong> (${tr[0][1]} registros).`]);
+ if(tb.length)patterns.push(["🕰️","Momento más frecuente",`El rango horario con más registros es <strong>${esc(tb[0][0])}</strong> (${tb[0][1]} registros).`]);
+ if(wd[0]&&wd[0][1])patterns.push(["📅","Día con más registros",`El día con más registros es <strong>${esc(wd[0][0])}</strong> (${wd[0][1]} registros).`]);
+ if(arr.length){const hi=arr.filter(e=>e.intensity>=7);if(hi.length&&counts(hi,"triggers").length)patterns.push(["🌱","Intensidad alta y contexto",`Entre los registros de intensidad 7–10, el detonante seleccionado con mayor frecuencia es <strong>${esc(counts(hi,"triggers")[0][0])}</strong>. Esto describe tus datos; no establece una causa.`])}
+ if(!patterns.length)patterns=[["🌿","Aún no hay patrones","Registra algunos episodios para que esta sección pueda describir frecuencias de tus propios datos."]];
+ $("#patternsList").innerHTML=patterns.map(p=>`<div class="card pattern-card"><div class="pattern-icon">${p[0]}</div><div><h3>${p[1]}</h3><p class="muted">${p[2]}</p></div></div>`).join("");
+ $("#patternBars").innerHTML=arr.length?`<div><strong>Emociones</strong>${barList(em.slice(0,8))}</div><div style="margin-top:18px"><strong>Detonantes</strong>${barList(tr.slice(0,8))}</div>`:"<div class='empty'>Aún no hay datos.</div>";
+}
+
+/* Wellbeing */
+$$(".tool-card").forEach(b=>b.addEventListener("click",()=>openTool(b.dataset.tool)));
+function openTool(tool){
+ if(tool==="breath"){modal("Respiración guiada",`<div class="breath"><div class="breath-circle" id="breathCircle">Inhala</div><div class="timer" id="breathTimer">4</div><p class="muted">Ciclo suave de 4 segundos para inhalar y 4 para exhalar.</p><button class="btn primary" id="startBreath">Comenzar</button></div>`);return;}
+ if(tool==="ground"){modal("Grounding 5–4–3–2–1",`<p>Si te resulta cómodo, orienta tu atención hacia el entorno:</p><ol><li><strong>5</strong> cosas que puedes ver.</li><li><strong>4</strong> cosas que puedes tocar.</li><li><strong>3</strong> sonidos que puedes escuchar.</li><li><strong>2</strong> olores que puedes notar.</li><li><strong>1</strong> sabor que puedes identificar.</li></ol><p class="muted">No necesitas hacerlo perfectamente. Puedes detenerte cuando quieras.</p>`,`<button class="btn primary" data-close>Listo</button>`);return;}
+ if(tool==="pause"){modal("Pausa de 60 segundos",`<div style="text-align:center"><div class="timer" id="pauseTimer">60</div><p class="muted">Durante este minuto, no necesitas resolver nada. Solo observa tu respiración, tu cuerpo y el lugar donde estás.</p><button class="btn primary" id="startPause">Comenzar</button></div>`);return;}
+ if(tool==="journal"){modal("Diario emocional",`<div class="field"><label>¿Qué estoy sintiendo ahora?</label><textarea id="quickJournal" placeholder="Escribe sin preocuparte por la forma..."></textarea></div>`,`<button class="btn" data-close>Cancelar</button><button class="btn primary" id="saveQuickJournal">Guardar en notas</button>`);return;}
+ if(tool==="people"){modal("Personas de confianza",`<p class="muted">Puedes mantener aquí una lista local de personas a quienes te gustaría acudir.</p><div class="field"><input id="trustedInput" placeholder="Nombre o relación"></div><div id="trustedList"></div>`,`<button class="btn primary" id="addTrusted">Añadir</button>`);renderTrusted();return;}
+ if(tool==="activities"){modal("Actividades que ayudan",`<p>Ideas para personalizar después: caminar, ducharte, música, ordenar un espacio, descansar, hablar con alguien, escribir, salir al aire libre.</p><div class="field"><input id="activityInput" placeholder="Añadir una actividad"></div><div id="activityList"></div>`,`<button class="btn primary" id="addActivity">Añadir</button>`);renderActivities();}
+}
+function getLocalList(k){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch{return[]}}
+function setLocalList(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function renderTrusted(){const a=getLocalList("ewt_people");$("#trustedList").innerHTML=a.length?a.map((x,i)=>`<div class="row">${esc(x)}<button class="btn danger" data-rm="${i}">×</button></div>`).join(""):"<p class='muted'>Aún no has añadido personas.</p>";$$("[data-rm]").forEach(b=>b.onclick=()=>{const a=getLocalList("ewt_people");a.splice(+b.dataset.rm,1);setLocalList("ewt_people",a);renderTrusted()})}
+function renderActivities(){const a=getLocalList("ewt_activities");$("#activityList").innerHTML=a.length?a.map((x,i)=>`<div class="row">${esc(x)}<button class="btn danger" data-ra="${i}">×</button></div>`).join(""):"<p class='muted'>Aún no has añadido actividades.</p>";$$("[data-ra]").forEach(b=>b.onclick=()=>{const a=getLocalList("ewt_activities");a.splice(+b.dataset.ra,1);setLocalList("ewt_activities",a);renderActivities()})}
+$("#modal").addEventListener("click",e=>{
+ if(e.target.matches("[data-close]"))closeModal();
+ if(e.target.id==="startBreath"){let n=8,phase=0;const c=$("#breathCircle"),t=$("#breathTimer");e.target.disabled=true;const tick=()=>{if(n<=0){c.textContent="Hecho";return}const inhale=phase%2===0;c.textContent=inhale?"Inhala":"Exhala";c.classList.toggle("expand",inhale);let s=4;t.textContent=s;const iv=setInterval(()=>{s--;t.textContent=s;if(s<=0){clearInterval(iv);phase++;n--;tick()}},1000)};tick()}
+ if(e.target.id==="startPause"){let n=60;e.target.disabled=true;$("#pauseTimer").textContent=n;const iv=setInterval(()=>{n--;$("#pauseTimer").textContent=n;if(n<=0){clearInterval(iv);$("#pauseTimer").textContent="Listo 🌿"}},1000)}
+ if(e.target.id==="saveQuickJournal"){const v=$("#quickJournal").value.trim();if(v){state.notes.unshift({id:uid(),date:new Date().toISOString(),text:v});save();closeModal();renderNotes();toast("Nota guardada")}else toast("Escribe algo antes de guardar.")}
+ if(e.target.id==="addTrusted"){const v=$("#trustedInput").value.trim();if(v){const a=getLocalList("ewt_people");a.push(v);setLocalList("ewt_people",a);$("#trustedInput").value="";renderTrusted()}}
+ if(e.target.id==="addActivity"){const v=$("#activityInput").value.trim();if(v){const a=getLocalList("ewt_activities");a.push(v);setLocalList("ewt_activities",a);$("#activityInput").value="";renderActivities()}}
+});
+
+/* Notes */
+function renderNotes(){
+ const q=($("#noteSearch").value||"").toLowerCase();const arr=state.notes.filter(n=>n.text.toLowerCase().includes(q));
+ $("#notesList").innerHTML=arr.length?arr.map(n=>`<article class="card note-card"><button class="delete-note" data-note-del="${n.id}" aria-label="Eliminar nota">×</button><small class="muted">${new Intl.DateTimeFormat("es-MX",{dateStyle:"medium",timeStyle:"short"}).format(new Date(n.date))}</small><p>${esc(n.text)}</p><button class="btn soft" data-note-edit="${n.id}">Editar</button></article>`).join(""):`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📝</div>Aún no hay notas.</div>`;
+ $$("[data-note-del]").forEach(b=>b.onclick=()=>{const id=b.dataset.noteDel;modal("Eliminar nota","¿Quieres eliminar esta nota?","<button class='btn' data-close>Cancelar</button><button class='btn danger' id='confirmNote'>Eliminar</button>");$("#confirmNote").onclick=()=>{state.notes=state.notes.filter(n=>n.id!==id);save();closeModal();renderNotes();toast("Nota eliminada")}})
+ $$("[data-note-edit]").forEach(b=>b.onclick=()=>{const n=state.notes.find(x=>x.id===b.dataset.noteEdit);modal("Editar nota",`<div class="field"><textarea id="editNote" style="min-height:180px">${esc(n.text)}</textarea></div>`,`<button class="btn" data-close>Cancelar</button><button class="btn primary" id="saveEditNote">Guardar</button>`);$("#saveEditNote").onclick=()=>{const v=$("#editNote").value.trim();if(v){n.text=v;n.date=new Date().toISOString();save();closeModal();renderNotes();toast("Nota actualizada")}}})
+}
+$("#newNote").addEventListener("click",()=>{modal("Nueva nota",`<div class="field"><label>Tu nota</label><textarea id="newNoteText" style="min-height:180px" placeholder="Escribe aquí..."></textarea></div>`,`<button class="btn" data-close>Cancelar</button><button class="btn primary" id="saveNewNote">Guardar</button>`);$("#saveNewNote").onclick=()=>{const v=$("#newNoteText").value.trim();if(v){state.notes.unshift({id:uid(),date:new Date().toISOString(),text:v});save();closeModal();renderNotes();toast("Nota guardada")}}});
+$("#noteSearch").addEventListener("input",renderNotes);
+
+/* Settings */
+function applySettings(){
+ document.documentElement.dataset.theme=state.settings.theme;document.documentElement.style.setProperty("--font",state.settings.font);
+ document.documentElement.classList.toggle("no-anim",!state.settings.motion);
+ $("#aliasSetting").value=state.settings.alias;$("#themeSetting").value=state.settings.theme;$("#fontSetting").value=state.settings.font;$("#motionSetting").checked=state.settings.motion;
+ $("#dashAlias").textContent=state.settings.alias?esc(state.settings.alias):"tú";$("#headerAlias").textContent=state.settings.alias?`Hola, ${state.settings.alias}`:"";
+}
+$("#aliasSetting").addEventListener("input",()=>{state.settings.alias=$("#aliasSetting").value.trim();save();applySettings()});
+$("#themeSetting").addEventListener("change",()=>{state.settings.theme=$("#themeSetting").value;save();applySettings();renderDashboard();renderStats()});
+$("#fontSetting").addEventListener("change",()=>{state.settings.font=$("#fontSetting").value;save();applySettings()});
+$("#motionSetting").addEventListener("change",()=>{state.settings.motion=$("#motionSetting").checked;save();applySettings()});
+
+/* Export / import */
+function download(name,text,type){const blob=new Blob([text],{type});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+$("#exportJson").addEventListener("click",()=>download("emotional_wellbeing_backup.json",JSON.stringify(state,null,2),"application/json"));
+$("#exportCsv").addEventListener("click",()=>{
+ const head=["fecha","inicio","fin","duracion_min","intensidad","emociones","detonantes","señales","donde","con_quien","actividad","antes","ayudo","notas"];
+ const rows=state.episodes.map(e=>[e.date,e.start,e.end,e.duration,e.intensity,(e.emotions||[]).join("|"),(e.triggers||[]).join("|"),(e.symptoms||[]).join("|"),e.location,e.withWho,e.activity,e.before,(e.help||[]).join("|"),e.notes]);
+ const csv=[head,...rows].map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");download("emotional_wellbeing_episodes.csv","\ufeff"+csv,"text/csv;charset=utf-8");
+});
+$("#importFile").addEventListener("change",e=>{
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.episodes))throw Error();state.episodes=x.episodes;state.notes=Array.isArray(x.notes)?x.notes:[];state.settings={...state.settings,...(x.settings||{})};save();applySettings();toast("Datos importados correctamente");renderDashboard();renderHistory();renderStats();renderPatterns();renderNotes()}catch{toast("El archivo no tiene un formato válido.")}};r.readAsText(f);e.target.value=""});
+$("#clearAll").addEventListener("click",()=>{modal("Borrar todos los datos","Se eliminarán episodios, notas y configuración local. Esta acción no se puede deshacer.","<button class='btn' data-close>Cancelar</button><button class='btn danger' id='confirmClear'>Sí, borrar todo</button>");$("#confirmClear").onclick=()=>{state.episodes=[];state.notes=[];state.settings={alias:"",theme:"light",font:"16px",motion:true};localStorage.removeItem(STORE);closeModal();applySettings();renderDashboard();renderHistory();renderStats();renderPatterns();renderNotes();toast("Datos borrados")}});
+
+/* Demo */
+function demoData(){
+ const now=new Date(), arr=[];
+ const emo=[[ "Agobio","Ansiedad"],["Tristeza","Soledad"],["Frustración","Irritabilidad"],["Ansiedad","Miedo"],["Agobio","Culpa"],["Tristeza","Vacío"],["Frustración","Enojo"],["Ansiedad","Agobio"]];
+ const trig=[["Trabajo / estudios"],["Falta de sueño"],["Relaciones"],["Sobrecarga de responsabilidades"],["Cansancio"],["Redes sociales"],["Conflicto"],["Familia"]];
+ for(let i=0;i<12;i++){const d=new Date(now);d.setDate(d.getDate()-(i*2%27));const h=9+(i*3)%12;const date=d.toISOString().slice(0,10),start=`${String(h).padStart(2,"0")}:${i%2?"30":"00"}`,dur=12+i*4;
+  const endMin=h*60+(i%2?30:0)+dur,end=`${String(Math.floor((endMin%1440)/60)).padStart(2,"0")}:${String(endMin%60).padStart(2,"0")}`;
+  arr.push({id:uid(),date,start,end,duration:dur,intensity:3+(i*2)%8,emotions:emo[i%emo.length],triggers:trig[i%trig.length],symptoms:["Sensación de estar sobrepasada",i%2?"Pensamientos acelerados":"Llanto"],location:i%2?"Casa":"Trabajo / estudios",withWho:i%3?"Sola":"Compañera",activity:"Actividad cotidiana",before:"Un momento de presión o cambio de ritmo.",help:i%2?["Caminar","Escuchar música"]:["Hablar con alguien","Respiración"],notes:"DATOS DE DEMOSTRACIÓN · Registro ficticio para explorar la aplicación.",updatedAt:new Date().toISOString()});}
+ state.episodes=arr;save();toast("Se cargaron datos ficticios de demostración");renderDashboard();renderHistory();renderStats();renderPatterns();
+}
+$("#demoBtn").addEventListener("click",demoData);$("#demoSettings").addEventListener("click",demoData);
+
+/* Inicialización */
+load();populateFilters();applySettings();renderDashboard();renderHistory();renderStats();renderPatterns();renderNotes();
+window.addEventListener("resize",()=>{if($("#dashboard").classList.contains("active"))renderDashboard();if($("#stats").classList.contains("active"))renderStats()});
+</script>
+</body>
+</html>
